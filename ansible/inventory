@@ -1,0 +1,14 @@
+[all]
+
+
+[master]
+master
+10.211.55.9
+
+[workers]
+worker
+10.211.55.10
+
+[nfs]
+nfs
+10.211.55.11

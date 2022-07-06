@@ -1,0 +1,43 @@
+# Playbook que instala las ultimas versiones de software disponibles
+# y posteriormente reinicia el nodo gestionado
+# $ ansible-playbook -i inventory 03_playbook.yaml -K
+---
+- name: 'Actualizacion de sistema operativo e instalación de rpms'
+  hosts: all
+  remote_user: rebecadelgado
+  become: true
+  vars_files:
+    - vars.yaml
+  tasks:
+    - name: 'Setear zona horaria'
+      timezone:
+        name: "{{ zone }}"
+    
+    - name: 'Actualizacion del sistema operativo'
+      dnf:
+        name: '*'
+        state: latest
+      notify: Reiniciar el nodo
+
+    - name: 'Actualizacion de rpms'
+      yum:
+        name: "{{ rpms }}"
+        state: latest
+    - name: 'Habilitar servicio chrony'
+      ansible.builtin.service:
+        name: "chronyd.service"
+        enabled: true
+        state: started
+    - name: 'Habilitar firewall'
+      ansible.builtin.service:
+        name: "firewalld.service"
+        enabled: true
+        state: started
+    - name: Deshabilitar SELinux
+      selinux:
+        state: disabled
+  handlers:
+    - name: 'Reiniciar el nodo'
+      reboot:
+        pre_reboot_delay: 5
+        msg: 'Reinicio iniciado por Ansible'

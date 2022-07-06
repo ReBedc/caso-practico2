@@ -1,0 +1,30 @@
+# Playbook que instala las ultimas versiones de software disponibles
+# y posteriormente reinicia el nodo gestionado
+# $ ansible-playbook -i inventory playbook.yaml -K
+---
+- name: 'Actualizacion de sistema operativo e instalación de rpms'
+  hosts: master
+  remote_user: azureuser
+  become: true
+  vars_files:
+    - vars.yaml
+  tasks:
+    - name: 'Actualizar hostname'
+      hostname:
+        name: "master.com"
+    
+    - name: 'Actualizacion del sistema operativo'
+      dnf:
+        name: '*'
+        state: latest
+      notify: Reiniciar el nodo
+
+    - name: 'Actualizacion de rpms'
+      yum:
+        name: "{{ rpms }}"
+        state: latest
+  handlers:
+    - name: 'Reiniciar el nodo'
+      reboot:
+        pre_reboot_delay: 5
+        msg: 'Reinicio iniciado por Ansible'
