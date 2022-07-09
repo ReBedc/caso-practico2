@@ -1,0 +1,11 @@
+---
+# vars file for role_common
+zone: 'Europe/Madrid'
+
+rpms:
+  - chrony
+  - firewalld
+
+services:
+  - chronyd
+  - firewalld

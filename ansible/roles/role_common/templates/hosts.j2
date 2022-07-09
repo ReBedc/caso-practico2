@@ -1,0 +1,12 @@
+{% for master in groups['master'] %}
+    {{ hostvars[master].ip_interna }} {{ hostvars[master].nombre_dominio }}
+{% endfor %}
+
+{% for worker in groups['worker'] %}
+    {{ hostvars[worker].ip_interna }} {{ hostvars[worker].nombre_dominio }}
+{% endfor %}
+
+{% for nfs in groups['nfs'] %}
+    {{ hostvars[nfs].ip_interna }} {{ hostvars[nfs].nombre_dominio }}
+{% endfor %}
+

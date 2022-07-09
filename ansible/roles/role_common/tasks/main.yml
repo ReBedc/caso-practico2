@@ -1,0 +1,54 @@
+---
+# tasks file for role_common
+- name: 'Setear zona horaria'
+  timezone:
+    name: "{{ zone }}"
+
+- name: 'Setear hostname'
+  hostname:
+    name: "{{ nombre_dominio }}"
+    use: systemd
+  tags: role_common
+
+- name: 'Setear IP interna'
+  set_fact:
+    ip_interna: "{{ ansible_facts['default_ipv4']['address'] }}"
+  tags: role_common
+
+- debug:
+    var: ip_interna
+  tags: role_common
+
+- name: 'Crear fichero /etc/hosts'
+  template:
+    src: templates/hosts.j2
+    dest: /etc/hosts
+    owner: root
+    mode: '0664'
+  tags: role_common
+
+- name: 'Actualizar rpms'
+  yum:
+    name: '*'
+    state: latest
+  notify: Reinicio
+  tags: role_common
+
+- name: 'Instalar rpms'
+  yum:
+    name: "{{ rpms }}"
+    state: latest
+  tags: role_common
+
+- name: 'Habilitar servicios necesarios'
+  systemd:
+    name: "{{ item }}"
+    state: started
+    enabled: yes
+  loop: "{{ services }}"
+  tags: role_common
+
+- name: Deshabilitar SELinux
+  selinux:
+    state: disabled
+  notify: Reinicio

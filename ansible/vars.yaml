@@ -1,3 +1,0 @@
-zone: 'Europe/Madrid'
-rpms: ['httpd','chrony','firewalld']
-mensaje: 'Este es el mensaje que imprime Ansible'
