@@ -1,2 +1,62 @@
 ---
 # tasks file for role_nfs
+- name: 'Instalar nfs-utils'
+  dnf:
+    name: nfs-utils
+    state: latest
+  tags: nfs
+
+- name: 'Crear directorio compartido'
+  file:
+    path: /mnt/shared_directory
+    state: directory
+    owner: 'nobody'
+    group: 'nobody'
+    mode: '0777'
+  tags: nfs
+
+- name: 'Añadir directorio compartido en /etc/exports'
+  lineinfile:
+    path: /etc/exports
+    line: "{{ item }}" 
+  loop:
+    - "{{ shared_directory }} 10.0.2.10(rw,sync,no_subtree_check)"
+    - "{{ shared_directory }} 10.0.2.11(rw,sync,no_subtree_check)"
+    - "{{ shared_directory }} 10.0.2.12(rw,sync,no_subtree_check)"
+  tags: nfs
+
+- name: 'Habilitar servicio nfs'
+  systemd:
+    name: nfs-server
+    state: started
+    enabled: yes
+  tags: nfs
+
+- name: 'Exportar el sistema de ficheros'
+  command: exportfs -r
+  tags: nfs
+
+- name: 'Verificar que el directorio está siendo exportado correctamente'
+  command: exportfs -s
+  register: exportfs_result
+  tags: nfs
+
+- debug:
+    var: exportfs_result
+  tags: nfs
+
+- name: 'Habilitar en el cortafuegos el tráfico para servicio NFS'
+  firewalld:
+    service: "{{ item }}"
+    permanent: yes
+    state: enabled
+  loop:
+    - nfs
+    - rpc-bind
+    - mountd
+  tags: nfs
+
+- name:  'Reinicio firewall'
+  systemd:
+    name: firewalld
+    state: reloaded

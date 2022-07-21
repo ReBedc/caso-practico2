@@ -5,7 +5,9 @@ zone: 'Europe/Madrid'
 rpms:
   - chrony
   - firewalld
+  - nfs-utils
 
 services:
   - chronyd
   - firewalld
+ 

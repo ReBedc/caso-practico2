@@ -1,2 +1,3 @@
 ---
 # vars file for role_nfs
+shared_directory: '/mnt/shared_directory'

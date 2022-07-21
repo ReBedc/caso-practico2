@@ -12,4 +12,31 @@
     - name: 'Ejecucion de tareas comunes'
       include_role:
         name: role_common
-      tags: role_common
+      tags: common
+    
+    - name: 'Configuración de NFS'
+      include_role:
+        name: role_nfs
+      when: inventory_hostname in groups['nfs']
+      tags: nfs
+
+    - name: 'Instalar kubernetes y dependencias'
+      include_role:
+        name: role_kubernetes
+      when: inventory_hostname in groups['kubernetes']
+      tags: kubernetes
+
+    - name: 'Configuración de kubernetes en master'
+      include_role:
+        name: role_master
+      when: inventory_hostname in groups['master']
+      tags: master
+
+    - name: 'Configuración de kubernetes en worker'
+      include_role:
+        name: role_worker
+      when: inventory_hostname in groups['worker']
+      tags: worker
+
+ 
+

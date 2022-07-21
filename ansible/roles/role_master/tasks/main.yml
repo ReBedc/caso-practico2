@@ -1,2 +1,94 @@
 ---
 # tasks file for role_master
+- name: 'Habilitar e iniciar kubelet'
+  systemd:
+    name: kubelet
+    state: started
+    enabled: yes
+  tags: master
+
+- name: 'Añadir firewalld'
+  firewalld:
+    port: "{{ item }}"
+    permanent: yes
+    state: enabled
+  loop:
+    - 6443/tcp
+    - 2379-2380/tcp
+    - 10250-10252/tcp
+    - 10255/tcp
+  tags: master
+
+- name:  'Reinicio firewall'
+  systemd:
+    name: firewalld
+    state: reloaded
+
+- name: 'Añadir firewalld'
+  firewalld:
+    rich_rule: 'rule family=ipv4 source address=10.0.2.11/32 port port=6643 protocol=tcp accept'
+    permanent: yes
+    state: enabled
+  tags: master
+
+- name:  'Reinicio firewall'
+  systemd:
+    name: firewalld
+    state: reloaded
+
+- name: 'Configurar kubeadm'
+  command: kubeadm config images pull
+  tags: master
+
+- name: 'Kubeadm init'
+  command: kubeadm init --pod-network-cidr=10.244.0.0/16
+  tags: master
+
+- name: 'KUBECONFIG'
+  shell: "export KUBECONFIG=/etc/kubernetes/admin.conf"
+  register: kubeconfig
+  tags: master
+
+- name: 'Crear directorio .kube'
+  file:
+    path: $HOME/.kube
+    state: directory
+    mode: 0755
+  tags: master
+
+- name: 'Copiar admin.conf'
+  ansible.builtin.copy:
+    src: /etc/kubernetes/admin.conf
+    dest: $HOME/.kube/config
+    remote_src: yes
+    owner: azureuser
+  tags: master
+
+- name: 'Permitir el tráfico en el cortafuegos del master y workers'
+  firewalld:
+    port: "{{ item }}"
+    permanent: yes
+    state: enabled
+  loop:
+    - 8285/udp
+    - 8472/udp
+  tags: master
+
+- name:  'Reinicio firewall'
+  systemd:
+    name: firewalld
+    state: reloaded
+  tags: master
+
+- name: 'Aplicar la definición de las políticas de red'
+  command: kubectl apply -f https://docs.projectcalico.org/manifests/canal.yaml
+  tags: master
+
+- name: 'Reinicio'
+  reboot:
+    msg: 'Reinicio iniciado por Ansible'
+  tags: master
+
+- name: 'Instalación del Ingress Controller (HAProxy)'
+  command: kubectl apply -f https://raw.githubusercontent.com/haproxytech/kubernetes-ingress/master/deploy/haproxy-ingress.yaml
+  tags: master

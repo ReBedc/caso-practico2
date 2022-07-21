@@ -1,0 +1,7 @@
+{% for master in groups['master'] %}
+    /mnt/shared_directory {{ hostvars[master].ip_interna }}(rw,sync,no_subtree_check)
+{% endfor %}
+
+{% for worker in groups['worker'] %}
+    {/mnt/shared_directory {{ hostvars[worker].ip_interna }}(rw,sync,no_subtree_check)
+{% endfor %}

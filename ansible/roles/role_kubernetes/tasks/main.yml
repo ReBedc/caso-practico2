@@ -1,0 +1,107 @@
+---
+# tasks file for role_kubernetes
+- name: 'Habilitar br_netfilter'
+  modprobe:
+    name: br_netfilter
+    state: present
+  tags: kubernetes
+
+- name: 'Setear masquerade'
+  firewalld:
+    masquerade: yes
+    permanent: yes
+    state: enabled
+  tags: kubernetes
+
+- name:  'Reinicio firewall'
+  systemd:
+    name: firewalld
+    state: reloaded
+
+- name: 'Crear fichero k8s.conf'
+  template:
+    src: templates/k8s.j2
+    dest: /etc/sysctl.d/k8s.conf
+    owner: root
+    mode: '0664'
+  tags: kubernetes
+
+- name: 'Sysctl reload'
+  shell: sysctl -p --system
+
+- name: 'Deshabilitar swap'
+  shell: swapoff -a
+  tags: kubernetes
+
+- name: Eliminar el swapfile /etc/fstab
+  mount:
+    name: "{{ item }}"
+    fstype: swap
+    state: absent
+  loop:
+    - swap
+    - none
+
+- name: Deshabilitar el Swap
+  command: swapoff -a
+  when: ansible_swaptotal_mb > 0
+
+- name: 'CRI-O Repo I'
+  uri:
+    url: "https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/CentOS_8_Stream/devel:kubic:libcontainers:stable.repo"
+    dest: "/etc/yum.repos.d/devel:kubic:libcontainers:stable.repo"
+  tags: kubernetes
+
+- name: 'CRI-O Repo II'
+  uri:
+    url: "https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable:cri-o:1.24/CentOS_8_Stream/devel:kubic:libcontainers:stable:cri-o:1.24.repo"
+    dest: "/etc/yum.repos.d/devel:kubic:libcontainers:stable:cri-o:1.24.repo"
+  tags: kubernetes
+
+- name: 'Instalar cri-o'
+  dnf:
+    name: cri-o
+    state: latest
+  tags: kubernetes
+
+- name: 'Crear fichero crio.conf'
+  template:
+    src: templates/crio-conf.j2
+    dest: /etc/modules-load.d/crio.conf
+    owner: root
+    mode: '0664'
+  tags: kubernetes
+
+- name: 'Habilitar e iniciar cri-o'
+  systemd:
+    name: crio
+    state: started
+    enabled: yes
+    daemon_reload: yes
+  tags: kubernetes
+
+- name: 'Habilitar el repositorio de Kubernetes'
+  template:
+    src: templates/k8s-repo.j2
+    dest: /etc/yum.repos.d/kubernetes.repo
+    owner: root
+    mode: '0664'
+  tags: kubernetes
+
+- name: 'Instalar kubernetes'
+  dnf:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - kubelet
+    - kubeadm
+    - kubectl
+  tags: kubernetes
+
+- name: 'Habilitar e iniciar kubelet'
+  systemd:
+    name: kubelet
+    daemon_reload: yes
+    state: started
+    enabled: yes
+  tags: kubernetes

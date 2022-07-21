@@ -1,2 +1,14 @@
 ---
 # tasks file for role_worker
+- name: 'Añadir firewalld'
+  firewalld:
+    port: "{{ item }}"
+    permanent: yes
+    state: enabled
+  loop:
+    - 8285/udp
+    - 8472/udp
+    - 30000-32767/tcp
+    - 10250/tcp
+  notify: Reinicio firewall
+  tags: worker

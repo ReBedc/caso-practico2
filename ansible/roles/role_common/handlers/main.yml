@@ -1,5 +1,2 @@
 ---
 # handlers file for role_common
-- name: 'Reinicio'
-  reboot:
-    msg: 'Reinicio iniciado por Ansible'

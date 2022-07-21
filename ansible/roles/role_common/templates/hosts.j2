@@ -1,12 +1,12 @@
 {% for master in groups['master'] %}
-    {{ hostvars[master].ip_interna }} {{ hostvars[master].nombre_dominio }}
+    {{ hostvars[master].ip_interna }} {{ hostvars[master].nombre_dominio }} {{ hostvars[master].nombre_dominio2 }}
 {% endfor %}
 
 {% for worker in groups['worker'] %}
-    {{ hostvars[worker].ip_interna }} {{ hostvars[worker].nombre_dominio }}
+    {{ hostvars[worker].ip_interna }} {{ hostvars[worker].nombre_dominio }} {{ hostvars[worker].nombre_dominio2 }}
 {% endfor %}
 
 {% for nfs in groups['nfs'] %}
-    {{ hostvars[nfs].ip_interna }} {{ hostvars[nfs].nombre_dominio }}
+    {{ hostvars[nfs].ip_interna }} {{ hostvars[nfs].nombre_dominio }} {{ hostvars[nfs].nombre_dominio2 }}
 {% endfor %}
 

@@ -1,2 +1,6 @@
 ---
 # handlers file for role_worker
+- name: 'Reinicio firewall'
+  systemd:
+    name: firewalld
+    state: reloaded
