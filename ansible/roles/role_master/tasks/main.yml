@@ -24,7 +24,7 @@
     name: firewalld
     state: reloaded
 
-- name: 'Añadir firewalld'
+- name: 'Añadir rich rule firewalld'
   firewalld:
     rich_rule: 'rule family=ipv4 source address=10.0.2.11/32 port port=6643 protocol=tcp accept'
     permanent: yes
@@ -44,7 +44,7 @@
   command: kubeadm init --pod-network-cidr=10.244.0.0/16
   tags: master
 
-- name: 'KUBECONFIG'
+- name: 'Exportar KUBECONFIG'
   shell: "export KUBECONFIG=/etc/kubernetes/admin.conf"
   register: kubeconfig
   tags: master
@@ -72,6 +72,9 @@
   loop:
     - 8285/udp
     - 8472/udp
+    - 8080/tcp
+    - 30000/tcp
+    - 50000/tcp
   tags: master
 
 - name:  'Reinicio firewall'

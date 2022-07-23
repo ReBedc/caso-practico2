@@ -1,24 +1,24 @@
 [master]
-20.0.60.186
+20.254.46.16
 [master:vars]
 nombre_dominio=master.com
 nombre_dominio2=master
 ip_interna=10.0.2.10
 
 [worker]
-20.0.61.31
+20.108.169.91
 [worker:vars]
 nombre_dominio=worker.com 
 nombre_dominio2=worker
 ip_interna=10.0.2.11
 
 [nfs]
-20.0.20.245
+20.254.46.140
 [nfs:vars]
 nombre_dominio=nfs.com 
 nombre_dominio2=nfs
 ip_interna=10.0.2.12
 
 [kubernetes]
-20.0.60.186
-20.0.61.31
+20.254.46.16
+20.108.169.91

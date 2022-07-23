@@ -42,9 +42,9 @@
     - swap
     - none
 
-- name: Deshabilitar el Swap
-  command: swapoff -a
-  when: ansible_swaptotal_mb > 0
+# - name: Deshabilitar el Swap
+#   command: swapoff -a
+#   when: ansible_swaptotal_mb > 0
 
 - name: 'CRI-O Repo I'
   uri:

@@ -1,2 +1,9 @@
 ---
 # vars file for role_app
+mongodb_user: mongodbuser
+mongodb_password: defaultpass
+mongodb_database: exampledb
+mongodb_admin_password: admin
+memory_limit: 512Mi
+k8s_name: mongodb
+namespace: mongodb
