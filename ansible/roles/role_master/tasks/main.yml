@@ -1,4 +1,5 @@
 ---
+# En ocasiones falla la tarea 'Instalación del Ingress Controller (HAProxy)', volver a ejecutar sin lanzar 'Kubeadm init'.
 # tasks file for role_master
 - name: 'Habilitar e iniciar kubelet'
   systemd:
@@ -23,6 +24,7 @@
   systemd:
     name: firewalld
     state: reloaded
+  tags: master
 
 - name: 'Añadir rich rule firewalld'
   firewalld:
@@ -35,6 +37,7 @@
   systemd:
     name: firewalld
     state: reloaded
+  tags: master
 
 - name: 'Configurar kubeadm'
   command: kubeadm config images pull
@@ -64,7 +67,9 @@
     owner: azureuser
   tags: master
 
-- name: 'Permitir el tráfico en el cortafuegos del master y workers'
+# Puertos 30000 y 50000 para jenkins
+# Puertos 2049 y 111 para NFS
+- name: 'Permitir el tráfico en el cortafuegos del master y worker'
   firewalld:
     port: "{{ item }}"
     permanent: yes
@@ -75,6 +80,8 @@
     - 8080/tcp
     - 30000/tcp
     - 50000/tcp
+    - 2049/tcp
+    - 111/udp
   tags: master
 
 - name:  'Reinicio firewall'

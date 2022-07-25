@@ -1,5 +1,8 @@
 ---
 # tasks file for role_worker
+
+# Puertos 30000 y 50000 para jenkins
+# Puertos 2049 y 111 para NFS
 - name: 'Añadir puertos firewalld'
   firewalld:
     port: "{{ item }}"
@@ -10,7 +13,9 @@
     - 8472/udp
     - 30000-32767/tcp
     - 10250/tcp
-    - 27017/tcp
-    - 32000/tcp
+    - 30000/tcp
+    - 50000/tcp
+    - 2049/tcp
+    - 111/udp
   notify: Reinicio firewall
   tags: worker

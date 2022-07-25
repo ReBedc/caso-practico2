@@ -1,6 +1,10 @@
-# Playbook que instala las ultimas versiones de software disponibles
-# y posteriormente reinicia el nodo gestionado
-# $ ansible-playbook -i inventory playbook.yaml -K
+# Playbook que ejecuta las tareas de inclusión de todos los roles creados para este caso práctico a excepción del "role_app"
+#   que se ejecutará cuando se haya unido el nodo worker correctamente al cluster de Kubernetes. 
+# A continuación se especificará el objetivo en cada una de las tareas de inclusión de roles
+#   que son las únicas tareas que forman parte de este playbook.
+
+# Para ejecutar el playbook correctamente:
+# $ ansible-playbook -i inventory playbook.yaml
 ---
 - name: 'Actualizacion de sistema operativo e instalación de rpms'
   hosts: all
@@ -9,29 +13,34 @@
   vars_files:
     - vars.yaml
   tasks:
+    # “role_common”: ejecutará las tareas de configuración comunes a todas las máquinas. 
     - name: 'Ejecucion de tareas comunes'
       include_role:
         name: role_common
       tags: common
     
+    # “role_nfs”: ejecutará las tareas específicas del servidor NFS. 
     - name: 'Configuración de NFS'
       include_role:
         name: role_nfs
       when: inventory_hostname in groups['nfs']
       tags: nfs
 
+    # “role_kubernetes”: ejecutará las tareas de configuración de kubernetes comunes en las máquinas master y worker. 
     - name: 'Instalar kubernetes y dependencias'
       include_role:
         name: role_kubernetes
       when: inventory_hostname in groups['kubernetes']
       tags: kubernetes
 
+    # “role_master”: ejecutará las tareas específicas de configuración para el nodo master. 
     - name: 'Configuración de kubernetes en master'
       include_role:
         name: role_master
       when: inventory_hostname in groups['master']
       tags: master
 
+    # “role_worker”: ejecutará las tareas específicas para el nodo worker. 
     - name: 'Configuración de kubernetes en worker'
       include_role:
         name: role_worker

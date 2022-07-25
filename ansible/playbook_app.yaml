@@ -1,9 +1,15 @@
-- name: 'Actualizacion de sistema operativo e instalación de rpms'
+# Playbook que lanza el role_app donde se lanzarán las tareas necesarias para desplegar la aplicación Jenkins en Kubernetes. 
+# Este playbook únicamente incluye el role "role_app" donde se encuentran todas la tareas necesarias para configurar Jenkins.
+
+# Para ejecutar el playbook correctamente:
+# $ ansible-playbook -i inventory playbook_app.yaml
+- name: 'Configuración de una aplicación con persistencia'
   hosts: master
   remote_user: azureuser
   become: true
   tasks:
- 
+    # “role_app”: ejecutará las tareas específicas tanto a nivel de SO como a nivel de comandos de Kubernetes para 
+    #   configurar una aplicación en kubernetes que utilice almacenamiento en el servidor NFS.  
     - name: 'Configuración de jenkins'
       include_role:
         name: role_app

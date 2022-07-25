@@ -20,9 +20,7 @@
     path: /etc/exports
     line: "{{ item }}" 
   loop:
-    - "{{ shared_directory }} 10.0.2.10(rw,sync,no_subtree_check)"
-    - "{{ shared_directory }} 10.0.2.11(rw,sync,no_subtree_check)"
-    - "{{ shared_directory }} 10.0.2.12(rw,sync,no_subtree_check)"
+    - "{{ shared_directory }} {{ subnet_cidr }}(rw,sync)"
   tags: nfs
 
 - name: 'Habilitar servicio nfs'

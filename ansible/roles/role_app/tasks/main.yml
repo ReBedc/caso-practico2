@@ -1,18 +1,18 @@
 
-- name: Abrir puerto https
+- name: 'Abrir puerto https'
   firewalld:
     service: https
     permanent: true
     state: enabled
   tags: app
 
-- name: Abrir puerto 30000
+- name: 'Abrir puerto 30000'
   firewalld:
     port: 30000/tcp
     permanent: true
     state: enabled
 
-- name: Hacer un reload de firewalld
+- name: 'Reinicio firewall'
   systemd:
     name: firewalld
     state: reloaded
@@ -25,14 +25,14 @@
     mode: 0755
   tags: app
 
-- name: Install git
+- name: 'Instalar git'
   yum:
     name: git
     state: present
     update_cache: yes
   tags: app
 
-- name: 'Git clone'
+- name: 'Clonar repositorio git'
   git:
     repo: https://github.com/ReBedc/unir-cp2-app.git
     dest: ./unir-cp2-app
@@ -42,64 +42,25 @@
   tags: app
 
 - name: 'Crear namespace'
-  command: kubectl create namespace jenkins-nm2
+  command: kubectl create namespace jenkins-nm
   run_once: true
   register: command_result
   failed_when: "'Updating' in command_result.stdout"
   tags: app
 
-# - name: 'Crear service'
-#   command: kubectl apply -f ./unir-cp2-app/jenkins-service.yaml --namespace jenkins-nm2
-#   tags: app
-
-# - name: 'Crear PV'
-#   command: kubectl create -f ./unir-cp2-app/jenkins-pv.yaml --namespace jenkins-nm2
-#   tags: app
-
-- name: 'Crear deployment'
-  command: kubectl create -f ./unir-cp2-app/jenkins-deployment.yaml --namespace jenkins-nm2
+- name: 'Crear services'
+  command: kubectl apply -f ./unir-cp2-app/jenkins-services.yaml --namespace jenkins-nm
   tags: app
 
-#-------------------------------------------------
-# - name: 'Git clone'
-#   git:
-#     repo: https://github.com/ReBedc/unir-cp2-mongo.git
-#     dest: ./unir-cp2-mongo
-#     clone: yes
-#     update: yes
-#     version: master
-#   tags: app
+- name: 'Crear PV'
+  command: kubectl create -f ./unir-cp2-app/jenkins-pv.yaml --namespace jenkins-nm
+  tags: app
 
+- name: 'Crear service NFS'
+  command: kubectl apply -f ./unir-cp2-app/nfs-service.yaml --namespace jenkins-nm
+  tags: app
 
-# - name: 'Crear namespace'
-#   command: kubectl create namespace mongodb-namespace
-#   run_once: true
-#   register: command_result
-#   failed_when: "'Updating' in command_result.stdout"
-#   tags: app
-
-# - name: 'Crear secretos'
-#   command: kubectl apply -f ./unir-cp2-mongo/mongodb-secrets.yaml -n mongodb-namespace
-#   tags: app
-
-
-# - name: 'Crear PV'
-#   command: kubectl create -f ./unir-cp2-mongo/mongodb-pv.yaml --namespace mongodb-namespace
-#   tags: app
-
-# - name: 'Crear PVC'
-#   command: kubectl create -f ./unir-cp2-mongo/mongodb-pvc.yaml --namespace mongodb-namespace
-#   tags: app
-
-# - name: 'Crear deployment'
-#   command: kubectl create -f ./unir-cp2-mongo/mongo-deployment.yaml --namespace mongodb-namespace
-#   tags: app
-
-# - name: 'Crear service'
-#   command: kubectl create -f ./unir-cp2-mongo/mongo-service.yaml --namespace mongodb-namespace
-#   tags: app
-
-# - name: 'Crear mongo client'
-#   command: kubectl create -f ./unir-cp2-mongo/mongodb-client.yaml --namespace mongodb-namespace
-#   tags: app
+- name: 'Crear deployment'
+  command: kubectl create -f ./unir-cp2-app/jenkins-deployment.yaml --namespace jenkins-nm
+  tags: app
 

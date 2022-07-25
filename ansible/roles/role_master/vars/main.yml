@@ -1,2 +1,4 @@
 ---
 # vars file for role_master
+ip_interna_worker: 10.0.2.11
+pod_network_cidr: 10.244.0.0/16
